@@ -1,7 +1,6 @@
 package com.example.classdiary
 
 import android.os.Bundle
-import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,8 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +31,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.classdiary.data.Student
 import com.example.classdiary.data.DataSouce
+import com.example.classdiary.ui.theme.AbrilFatface
 import com.example.classdiary.ui.theme.ClassDiaryTheme
+import com.example.classdiary.ui.theme.Libertinus
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +44,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ClassDiaryTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier =
+                        Modifier.fillMaxSize(),
+                    topBar = {
+                        ClassDiaryTopAppBar()
+                    }
+                )
+                { innerPadding ->
                     classDiaryApp(
                         modifier = Modifier
                             .padding(innerPadding)
@@ -48,6 +60,18 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClassDiaryTopAppBar(modifier: Modifier = Modifier){
+    CenterAlignedTopAppBar(
+        title = {
+                Text(
+                    text = "Lista de alunos")
+        },
+        modifier = Modifier
+    )
 }
 
 @Composable
@@ -60,8 +84,36 @@ fun classDiaryApp(modifier: Modifier = Modifier) {
             .padding(16.dp),
 
         ) {
-        StudentsList(modifier = modifier,
-            DataSouce().loadAStudents())
+        StudentsList(
+            modifier = modifier,
+            DataSouce().loadAStudents()
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun ClassDiaryPreviewDark() {
+    ClassDiaryTheme(darkTheme = true) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            classDiaryApp(
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        }
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun ClassDiaryPreview() {
+    ClassDiaryTheme(darkTheme = false) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            classDiaryApp(
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        }
     }
 }
 
@@ -85,41 +137,56 @@ fun StudentsList(
 
 @Composable
 fun StudentCard(
-    modifier: Modifier = Modifier,
     @DrawableRes studentPhoto: Int,
     studentName: String,
     studentCurse: String,
+    modifier: Modifier
 ) {
-
     Card(
-        modifier = modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp), // Padding local do card
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(
+            bottomStart = 26.dp,
+            topEnd = 26.dp,
+            bottomEnd = 1.dp,
+            topStart = 1.dp
+        )
     ) {
         Row(
-            modifier = modifier,
+            modifier = Modifier
+                .padding(8.dp) // Padding interno
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Start
         ) {
             Image(
                 painter = painterResource(id = studentPhoto),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(100.dp)
                     .padding(10.dp)
                     .clip(CircleShape)
             )
 
-            Column {
-                Text(text = studentName)
-                Text(text = studentCurse)
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = studentName,
+                    fontSize = 20.sp,
+                    fontFamily = AbrilFatface
+                )
+                Text(
+                    text = studentCurse,
+                    fontSize = 16.sp,
+                    fontFamily = Libertinus
+                )
             }
-
         }
-
-
     }
-
 }
+
 
