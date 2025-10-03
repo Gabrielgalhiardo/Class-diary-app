@@ -283,7 +283,7 @@ fun StudentCard(
             StudentDetailsButton(
                 modifier = modifier
                     .weight(0.5f)
-                    .wrapContentSize(align = Alignment.BottomCenter),
+                    .wrapContentSize(align = Alignment.CenterEnd),
                 expanded = expanded,
                 onClick = { expanded = !expanded})
 
