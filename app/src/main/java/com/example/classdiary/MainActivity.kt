@@ -1,9 +1,7 @@
 package com.example.classdiary
 
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -59,11 +56,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.classdiary.data.Student
-import com.example.classdiary.data.DataSouce
+import com.example.classdiary.ui.cadastro.CadastroScreen
 import com.example.classdiary.ui.theme.AbrilFatface
 import com.example.classdiary.ui.theme.ClassDiaryTheme
 import com.example.classdiary.ui.theme.Libertinus
-import org.w3c.dom.Text
 
 class MainActivity : ComponentActivity() {
     val TAG = "MainActivity"
@@ -77,7 +73,7 @@ class MainActivity : ComponentActivity() {
                      topBar = {
                         ClassDiaryTopAppBar()
                     }) { innerPadding ->
-                    classDiaryApp(
+                    CadastroScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .statusBarsPadding()
@@ -143,9 +139,9 @@ fun classDiaryApp(modifier: Modifier = Modifier) {
             ),
 
         ) {
-        StudentsList(
-            modifier = modifier, DataSouce().loadAStudents()
-        )
+//        StudentsList(
+////            modifier = modifier, DataSouce().loadAStudents()
+//        )
     }
 }
 
@@ -179,12 +175,12 @@ fun StudentsList(
 ) {
     LazyColumn(modifier = modifier) {
         items(studentList) { student ->
-            StudentCard(
-                modifier = modifier,
-                studentPhoto = student.photo,
-                studentName = student.name,
-                studentCurse = student.curse
-            )
+//            StudentCard(
+////                modifier = modifier,
+////                studentPhoto = student.photo,
+////                studentName = student.name,
+////                studentCurse = student.curse
+////            )
         }
     }
 
@@ -230,7 +226,7 @@ fun StudentsDetails() {
 }
 
 @Composable
-fun StudentCard(
+ fun StudentCard(
     @DrawableRes studentPhoto: Int, studentName: String, studentCurse: String, modifier: Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }

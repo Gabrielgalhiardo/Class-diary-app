@@ -1,26 +1,25 @@
 package com.example.classdiary.ui.cadastro
 
-// Imports para Layout e Componentes
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,99 +32,190 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.classdiary.R // Lembre-se de importar o R do seu projeto
+import coil.compose.rememberAsyncImagePainter
+import com.example.classdiary.MainActivity
+import com.example.classdiary.R
+import com.example.classdiary.StudentCard
 
 @Composable
-fun CadastroScreen(cadastroViewModel: CadastroViewModel = viewModel()) {
+fun CadastroScreen(
+    cadastroViewModel: CadastroViewModel = viewModel(),
+    modifier: Modifier = Modifier
+) {
     val cadastroUIState by cadastroViewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
+    LaunchedEffect(Unit) {
+        cadastroViewModel.carregarStudents()
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        cadastroViewModel.onFotoChange(uri)
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            fontSize = 33.sp,
-            text = "Cadastrar"
-        )
-        Spacer(Modifier.height(30.dp))
+        item {
+            Text(
+                fontSize = 33.sp,
+                text = "Cadastrar"
+            )
+            Spacer(Modifier.height(30.dp))
+        }
 
-        // Chamada para o componente da Foto com o ícone de edição
-        Foto(
-            onEditClick = {
-                // Lógica para quando o usuário clicar em editar a foto
-                println("Clicou para editar a foto!")
-            }
-        )
-        Spacer(Modifier.height(30.dp))
+        item {
+            Foto(
+                uri = cadastroUIState.fotoUri,
+                onEditClick = { launcher.launch("image/*") }
+            )
+            Spacer(Modifier.height(30.dp))
+        }
 
-        // Campos de Texto
-        CampoTexto(
-            value = cadastroViewModel.nome,
-            onValueChange = { cadastroViewModel.mudarTextoNome(it) },
-            isError = cadastroUIState.nomeInvalido,
-            label = cadastroUIState.labelNome
-        )
-        Spacer(Modifier.height(16.dp))
-
-        CampoTexto(
-            value = cadastroViewModel.email,
-            onValueChange = { cadastroViewModel.mudarTextoEmail(it) },
-            isError = cadastroUIState.emailInvalido,
-            label = cadastroUIState.labelEmail
-        )
-        Spacer(Modifier.height(16.dp))
-
-        CampoTexto(
-            value = cadastroViewModel.senha,
-            onValueChange = { cadastroViewModel.mudarTextoSenha(it) },
-            isError = cadastroUIState.senhaInvalida,
-            label = cadastroUIState.labelSenha
-        )
-        Spacer(Modifier.height(30.dp))
-
-        // Botão de Cadastro
-        BotaoCadastrar(
-            onClick = {
-                cadastroViewModel.cadastrar()
-            }
-        )
-
-        // Mensagem de sucesso
-        if (cadastroUIState.cadastroSucesso) {
+        item {
+            CampoTexto(
+                value = cadastroUIState.nome,
+                onValueChange = { cadastroViewModel.mudarTextoNome(it) },
+                isError = cadastroUIState.nomeInvalido,
+                label = cadastroUIState.labelNome,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(16.dp))
-            Text("Cadastro realizado com sucesso!")
+        }
+
+        item {
+            CampoTexto(
+                value = cadastroUIState.email,
+                onValueChange = { cadastroViewModel.mudarTextoEmail(it) },
+                isError = cadastroUIState.emailInvalido,
+                label = cadastroUIState.labelEmail,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        item {
+            CampoTexto(
+                value = cadastroUIState.senha,
+                onValueChange = { cadastroViewModel.mudarTextoSenha(it) },
+                isError = cadastroUIState.senhaInvalida,
+                label = cadastroUIState.labelSenha,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        item {
+            CampoTexto(
+                value = cadastroUIState.curso,
+                onValueChange = { cadastroViewModel.mudarTextoCurso(it) },
+                isError = cadastroUIState.cursoInvalido,
+                label = cadastroUIState.labelCurso,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(30.dp))
+        }
+
+        item {
+            BotaoCadastrar(
+                onClick = { cadastroViewModel.cadastrar() },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+
+        if (cadastroUIState.cadastroSucesso) {
+            item {
+                Text(
+                    "Cadastro realizado com sucesso!",
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+
+        if (cadastroUIState.isLoading) {
+            item {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Carregando usuários...")
+            }
+        } else {
+            if (cadastroUIState.students.isNotEmpty()) {
+                item {
+                    Text("Usuários cadastrados:", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+
+            items(cadastroUIState.students) { user ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Image(
+                        painter = if (user.fotoUri != null) rememberAsyncImagePainter(user.fotoUri) else painterResource(R.drawable.eric),
+                        contentDescription = "Foto",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${user.nome} - ${user.email}")
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
+
 @Composable
 fun Foto(
     modifier: Modifier = Modifier,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    uri: Uri?
 ) {
-    Box(modifier = modifier) {
-        // Camada 1: A Imagem de Perfil
+    val imagePainter = if (uri != null) {
+        rememberAsyncImagePainter(uri)
+    } else {
+        painterResource(R.drawable.eric) // Imagem padrão
+    }
+
+    Box(
+        modifier = modifier
+            .size(150.dp)
+    ) {
         Image(
-            painter = painterResource(R.drawable.eric), // Sua imagem de exemplo
+            painter = imagePainter,
             contentDescription = "Foto de perfil",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(150.dp)
+                .fillMaxSize()
                 .clip(CircleShape)
         )
 
-        // Camada 2: O Ícone de Edição
         Icon(
             imageVector = Icons.Filled.Edit,
             contentDescription = "Editar foto",
             tint = Color.White,
             modifier = Modifier
-                .align(Alignment.BottomEnd) // Alinha no canto inferior direito
-                .background(MaterialTheme.colorScheme.primary, CircleShape) // Fundo circular
+                .align(Alignment.BottomEnd)
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
                 .clip(CircleShape)
-                .clickable { onEditClick() } // Ação de clique
-                .padding(8.dp) // Espaçamento interno (dentro do círculo)
+                .clickable { onEditClick() }
+                .padding(8.dp)
                 .size(24.dp)
         )
     }
@@ -133,18 +223,16 @@ fun Foto(
 
 @Composable
 fun CampoTexto(
-    value: String = "",
+    value: String,
     onValueChange: (String) -> Unit,
-    label: String = "",
-    isError: Boolean = false,
+    label: String,
+    isError: Boolean,
     modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = {
-            Text(text = label)
-        },
+        label = { Text(text = label) },
         isError = isError,
         singleLine = true,
         modifier = modifier
@@ -158,16 +246,19 @@ fun BotaoCadastrar(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
+        modifier =
+            modifier
+                .si(20.dp)
+                .height(38.dp)
     ) {
-        Text(
-            text = "Cadastrar"
-        )
+        Text(text = "Cadastrar", fontSize = 16.sp)
     }
 }
 
 @Composable
 @Preview(showSystemUi = true)
 fun PreviewCadastroScreen() {
+    // Para o preview funcionar, você pode precisar envolver em um Theme
+    // Ex: SeuAppTheme { CadastroScreen() }
     CadastroScreen()
 }

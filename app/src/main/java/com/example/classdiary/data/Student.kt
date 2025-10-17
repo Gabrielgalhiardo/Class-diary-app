@@ -1,7 +1,11 @@
 package com.example.classdiary.data
 
-data class Student (
-    val name: String,
-    val photo: Int,
-    val curse: String,
+import android.net.Uri
+
+data class Student(
+    val nome: String,
+    val email: String,
+    val senha: String,
+    val curso: String,
+    val fotoUri: Uri? = null
 )
