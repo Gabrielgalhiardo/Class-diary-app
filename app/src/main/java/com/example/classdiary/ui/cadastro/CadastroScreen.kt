@@ -28,17 +28,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.classdiary.MainActivity
 import com.example.classdiary.R
-import com.example.classdiary.StudentCard
 
 @Composable
 fun CadastroScreen(
+    onCadastro: () -> Unit,
     cadastroViewModel: CadastroViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -123,6 +121,7 @@ fun CadastroScreen(
 
         item {
             BotaoCadastrar(
+                onCadastro = { onCadastro },
                 onClick = { cadastroViewModel.cadastrar() },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -161,7 +160,7 @@ fun CadastroScreen(
                         .padding(vertical = 4.dp)
                 ) {
                     Image(
-                        painter = if (user.fotoUri != null) rememberAsyncImagePainter(user.fotoUri) else painterResource(R.drawable.eric),
+                        painter = if (user.fotoUri != null) rememberAsyncImagePainter(user.fotoUri) else painterResource(R.drawable.avatar_icon),
                         contentDescription = "Foto",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -190,7 +189,7 @@ fun Foto(
     val imagePainter = if (uri != null) {
         rememberAsyncImagePainter(uri)
     } else {
-        painterResource(R.drawable.eric) // Imagem padrão
+        painterResource(R.drawable.avatar_icon)
     }
 
     Box(
@@ -241,24 +240,28 @@ fun CampoTexto(
 
 @Composable
 fun BotaoCadastrar(
+    onCadastro: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = onClick,
+        onClick = {
+            onClick
+            onCadastro
+        },
         modifier =
             modifier
-                .si(20.dp)
+                .padding(20.dp)
                 .height(38.dp)
     ) {
         Text(text = "Cadastrar", fontSize = 16.sp)
     }
 }
 
-@Composable
-@Preview(showSystemUi = true)
-fun PreviewCadastroScreen() {
-    // Para o preview funcionar, você pode precisar envolver em um Theme
-    // Ex: SeuAppTheme { CadastroScreen() }
-    CadastroScreen()
-}
+//@Composable
+//@Preview(showSystemUi = true)
+//fun PreviewCadastroScreen() {
+//    // Para o preview funcionar, você pode precisar envolver em um Theme
+//    // Ex: SeuAppTheme { CadastroScreen() }
+//    CadastroScreen(onCadastro = )
+//}

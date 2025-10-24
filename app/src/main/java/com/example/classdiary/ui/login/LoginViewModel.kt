@@ -1,52 +1,38 @@
-package com.rafaelcosta.diariodeclasse.ui.login
+package com.example.classdiary.ui.login
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.classdiary.data.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(LoginUIState())
-    val uiState: StateFlow<LoginUIState> = _uiState.asStateFlow()
 
-    var login by mutableStateOf("")
-        private set
 
-    var senha by mutableStateOf("")
-        private set
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val repo: AuthRepository
+) : ViewModel() {
 
-    fun mudarTextoLogin(textoLogin: String) {
-        login = textoLogin
-        reset()
-    }
+    private val _state = MutableStateFlow(LoginUiState())
+    val state: StateFlow<LoginUiState> = _state
 
-    fun mudarTextoSenha(textoSenha: String) {
-        senha = textoSenha
-        reset()
-    }
+    fun onEmailChange(v: String) = _state.update { it.copy(email = v) }
+    fun onSenhaChange(v: String) = _state.update { it.copy(senha = v) }
 
-    fun logar() {
-        if (senha.equals("1234") && login.equals("rafa")) {
-            _uiState.update { currentState ->
-                currentState.copy(loginSucesso = true)
+    fun login(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _state.update { it.copy(loading = true, error = null) }
+            try {
+                val ok = repo.login(_state.value.email, _state.value.senha)
+                if (ok) onSuccess()
+                else _state.update { it.copy(loading = false, error = "Falha no login") }
+            } catch (e: Exception) {
+                _state.update { it.copy(loading = false, error = e.message ?: "Erro no login") }
             }
-        }else{
-            _uiState.update { currentState ->
-                currentState.copy(errouLoginOuSenha = true )
-            }
-        }
-    }
-
-    fun reset(){
-        _uiState.update { currentState ->
-            currentState.copy(
-                errouLoginOuSenha = false,
-                loginSucesso = false
-            )
         }
     }
 }

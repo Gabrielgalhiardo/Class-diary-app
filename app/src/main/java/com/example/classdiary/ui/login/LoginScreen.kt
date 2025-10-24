@@ -1,102 +1,67 @@
-package com.rafaelcosta.diariodeclasse.ui.login
+package com.example.classdiary.ui.login
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
-    val loginUIState by loginViewModel.uiState.collectAsState()
+fun LoginScreen(
+    onCadastro: () -> Unit,
+    onLoginSuccess: () -> Unit,
+    vm: LoginViewModel = hiltViewModel()
+) {
+    val state by vm.state.collectAsState()
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize(),
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Text(
-            fontSize = 33.sp,
-            text = "Logar")
-        Spacer(Modifier.size(30.dp))
-        CampoTextoLoginSenha(
-            value = loginViewModel.login,
-            onValueChange = { loginViewModel.mudarTextoLogin(it) },
-            isError = loginUIState.errouLoginOuSenha,
-            label = loginUIState.labelLogin
-        )
-        Spacer(Modifier.size(30.dp))
-        CampoTextoLoginSenha(
-            value = loginViewModel.senha,
-            onValueChange = { loginViewModel.mudarTextoSenha(it) },
-            isError = loginUIState.errouLoginOuSenha,
-            label = loginUIState.labelSenha
-        )
-        Spacer(Modifier.size(30.dp))
-
-        BotaoLogar(
-            onClick = {
-                loginViewModel.logar()
-            }
-        )
-        if(loginUIState.loginSucesso)
-            Text("Logoooou!!!!!")
-
-    }
-}
-
-@Composable
-fun CampoTextoLoginSenha(
-    value: String = "",
-    onValueChange: (String) -> Unit,
-    label: String = "",
-    isError: Boolean = false,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(text = label)
-        },
-        isError = isError,
-        singleLine = true,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun BotaoLogar(
-    onClick:()-> Unit,
-    modifier: Modifier = Modifier
-){
-    Button(
-        onClick = onClick,
-        modifier = modifier
     ) {
-       Text(
-           text =  "Entrar"
-       )
-    }
-}
+        Text("Login", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(16.dp))
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = vm::onEmailChange,
+            label = { Text("E-mail") },
+            singleLine = true
+        )
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = state.senha,
+            onValueChange = vm::onSenhaChange,
+            label = { Text("Senha") },
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
+        )
+        Spacer(Modifier.height(16.dp))
+        Button(
+            onClick = { vm.login(onLoginSuccess) },
+            enabled = !state.loading
+        ) {
+            if (state.loading)
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+            else Text("Entrar")
+        }
+        Spacer(Modifier.height(16.dp))
+        Button(
+            onClick = { onCadastro },
+            enabled = !state.loading
+        ) {
+            if (state.loading)
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+            else Text("Entrar")
+        }
 
-@Composable
-@Preview(showSystemUi = true)
-fun PreviewLogin(){
-    LoginScreen()
+        state.error?.let {
+            Spacer(Modifier.height(8.dp))
+            Text(it, color = MaterialTheme.colorScheme.error)
+        }
+    }
 }
