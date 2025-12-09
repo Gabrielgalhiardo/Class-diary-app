@@ -1,4 +1,4 @@
-package com.rafaelcosta.app_modelo_login_jwt
+package com.example.classdiary
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

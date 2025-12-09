@@ -1,7 +1,9 @@
 package com.example.classdiary.di
 
 import android.content.Context
+import com.example.classdiary.data.DataSource
 import com.example.classdiary.data.local.TokenStore
+import com.example.classdiary.data.local.UserStore
 import com.example.classdiary.data.remote.ApiService
 import com.example.classdiary.data.repository.AuthRepository
 
@@ -27,6 +29,9 @@ object AppModule {
 
     @Provides @Singleton
     fun provideTokenStore(@ApplicationContext context: Context) = TokenStore(context)
+
+    @Provides @Singleton
+    fun provideUserStore(@ApplicationContext context: Context) = UserStore(context)
 
     @Provides @Singleton
     fun provideOkHttp(store: TokenStore): OkHttpClient {
@@ -63,6 +68,9 @@ object AppModule {
         retrofit.create(ApiService::class.java)
 
     @Provides @Singleton
-    fun provideAuthRepository(api: ApiService, store: TokenStore) =
-        AuthRepository(api, store)
+    fun provideAuthRepository(api: ApiService, store: TokenStore, userStore: UserStore) =
+        AuthRepository(api, store, userStore)
+
+    @Provides @Singleton
+    fun provideDataSource(userStore: UserStore) = DataSource(userStore)
 }

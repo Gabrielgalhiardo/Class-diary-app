@@ -1,20 +1,23 @@
 package com.example.classdiary.ui.cadastro
 
-import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.classdiary.data.DataSource
 import com.example.classdiary.data.Student
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CadastroViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class CadastroViewModel @Inject constructor(
+    private val dataSource: DataSource
+) : ViewModel() {
 
-    private val dataSource = DataSource(application)
     private val _uiState = MutableStateFlow(CadastroUIState())
     val uiState: StateFlow<CadastroUIState> = _uiState.asStateFlow()
 
@@ -82,16 +85,20 @@ class CadastroViewModel(application: Application) : AndroidViewModel(application
             fotoUri = stateAtual.fotoUri
         )
 
-        _uiState.update {
-            it.copy(
-                students = it.students + novoStudent,
-                cadastroSucesso = true,
-                nome = "",
-                email = "",
-                senha = "",
-                curso = "",
-                fotoUri = null
-            )
+        viewModelScope.launch {
+            dataSource.saveStudent(novoStudent)
+            val updatedStudents = dataSource.loadAStudents()
+            _uiState.update {
+                it.copy(
+                    students = updatedStudents,
+                    cadastroSucesso = true,
+                    nome = "",
+                    email = "",
+                    senha = "",
+                    curso = "",
+                    fotoUri = null
+                )
+            }
         }
     }
 

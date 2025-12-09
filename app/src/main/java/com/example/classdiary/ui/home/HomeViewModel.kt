@@ -23,7 +23,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val me = repo.me()
-                _state.value = HomeUiState(me.nome, me.email, false, null)
+                _state.value = HomeUiState(
+                    nome = me.nome,
+                    email = me.email,
+                    loading = false,
+                    error = null
+                )
             } catch (e: Exception) {
                 _state.value = HomeUiState(error = e.message, loading = false)
             }

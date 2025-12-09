@@ -1,13 +1,16 @@
 package com.example.classdiary.data
 
 import android.content.Context
-import kotlinx.coroutines.delay
+import com.example.classdiary.data.local.UserStore
+import kotlinx.coroutines.flow.first
 
-class DataSource(private val context: Context) {
-    suspend fun loadAStudents(): List<Student>{
-        delay(1000)
-
-            return listOf(
+class DataSource(private val userStore: UserStore) {
+    
+    suspend fun loadAStudents(): List<Student> {
+        val users = userStore.users.first()
+        // Se não houver usuários, inicializa com usuários mock
+        if (users.isEmpty()) {
+            val mockUsers = listOf(
                 Student(
                     nome = "Gabriel",
                     email = "gabriel@dominio.com",
@@ -37,5 +40,21 @@ class DataSource(private val context: Context) {
                     fotoUri = null
                 )
             )
+            userStore.saveUsers(mockUsers)
+            return mockUsers
+        }
+        return users
+    }
+    
+    suspend fun saveStudent(student: Student) {
+        val currentUsers = userStore.users.first().toMutableList()
+        // Verifica se o email já existe
+        val existingIndex = currentUsers.indexOfFirst { it.email == student.email }
+        if (existingIndex >= 0) {
+            currentUsers[existingIndex] = student
+        } else {
+            currentUsers.add(student)
+        }
+        userStore.saveUsers(currentUsers)
     }
 }
