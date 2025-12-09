@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -54,99 +52,73 @@ fun CadastroScreen(
         cadastroViewModel.onFotoChange(uri)
     }
 
-    Box(
-        modifier = Modifier
+    LazyColumn(
+        modifier = modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.surface
-                    )
-                )
-            )
+            .padding(32.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Spacer(Modifier.height(24.dp))
-                Text(
-                    text = "Criar Conta",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = "Preencha os dados para se cadastrar",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(16.dp))
-            }
-
         item {
-            Card(
-                modifier = Modifier.padding(vertical = 8.dp),
-                shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Foto(
-                    uri = cadastroUIState.fotoUri,
-                    onEditClick = { launcher.launch("image/*") },
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Criar Conta",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
         }
 
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    CampoTexto(
-                        value = cadastroUIState.nome,
-                        onValueChange = { cadastroViewModel.mudarTextoNome(it) },
-                        isError = cadastroUIState.nomeInvalido,
-                        label = cadastroUIState.labelNome,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            Foto(
+                uri = cadastroUIState.fotoUri,
+                onEditClick = { launcher.launch("image/*") },
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
 
-                    CampoTexto(
-                        value = cadastroUIState.email,
-                        onValueChange = { cadastroViewModel.mudarTextoEmail(it) },
-                        isError = cadastroUIState.emailInvalido,
-                        label = cadastroUIState.labelEmail,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+        item {
+            CampoTexto(
+                value = cadastroUIState.nome,
+                onValueChange = { cadastroViewModel.mudarTextoNome(it) },
+                isError = cadastroUIState.nomeInvalido,
+                label = cadastroUIState.labelNome,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-                    CampoTexto(
-                        value = cadastroUIState.senha,
-                        onValueChange = { cadastroViewModel.mudarTextoSenha(it) },
-                        isError = cadastroUIState.senhaInvalida,
-                        label = cadastroUIState.labelSenha,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+        item {
+            CampoTexto(
+                value = cadastroUIState.email,
+                onValueChange = { cadastroViewModel.mudarTextoEmail(it) },
+                isError = cadastroUIState.emailInvalido,
+                label = cadastroUIState.labelEmail,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-                    CampoTexto(
-                        value = cadastroUIState.curso,
-                        onValueChange = { cadastroViewModel.mudarTextoCurso(it) },
-                        isError = cadastroUIState.cursoInvalido,
-                        label = cadastroUIState.labelCurso,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
+        item {
+            CampoTexto(
+                value = cadastroUIState.senha,
+                onValueChange = { cadastroViewModel.mudarTextoSenha(it) },
+                isError = cadastroUIState.senhaInvalida,
+                label = cadastroUIState.labelSenha,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            CampoTexto(
+                value = cadastroUIState.curso,
+                onValueChange = { cadastroViewModel.mudarTextoCurso(it) },
+                isError = cadastroUIState.cursoInvalido,
+                label = cadastroUIState.labelCurso,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(8.dp))
         }
 
         item {
@@ -156,58 +128,45 @@ fun CadastroScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
+                    .height(50.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = "Cadastrar",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 16.sp
                 )
             }
         }
 
         if (cadastroUIState.cadastroSucesso) {
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "✓ Cadastro realizado com sucesso!",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-        }
-
-        item {
-            // Botão para voltar ao login
-            OutlinedButton(
-                onClick = onCadastro,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
                 Text(
-                    text = "Voltar ao Login",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "✓ Cadastro realizado com sucesso!",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
         }
 
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(
+                onClick = onCadastro,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Voltar ao Login",
+                    fontSize = 16.sp
+                )
+            }
         }
-    }
+
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }
 
@@ -238,17 +197,17 @@ fun Foto(
                 .clip(CircleShape)
         )
 
-        FloatingActionButton(
+        IconButton(
             onClick = onEditClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .size(40.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
+                .size(40.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = "Editar foto",
+                tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -270,14 +229,7 @@ fun CampoTexto(
         isError = isError,
         singleLine = true,
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        colors = if (isError) {
-            OutlinedTextFieldDefaults.colors(
-                errorContainerColor = MaterialTheme.colorScheme.errorContainer
-            )
-        } else {
-            OutlinedTextFieldDefaults.colors()
-        }
+        shape = RoundedCornerShape(8.dp)
     )
 }
 
